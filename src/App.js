@@ -15,24 +15,14 @@ The instructions for this project are located in the `instructions.md` file.
 class App extends Component {
   state = {
     users: []
-  }
+  };
 
   handleAddUser = (user) => {
-    this.isUserDuplicate(user) ? alert("User already exists") :
-      this.setState((currentState) => ({
-        users: [...currentState.users, user]
-      }));
-  }
-
-  isUserDuplicate = (user) => {
-    let userDuplicate = false;
-    this.state.users.forEach((currentUser) => {
-      if(currentUser.username === user.username) {
-        userDuplicate = true;
-      }
-    });
-    return userDuplicate;
-  }
+    user.numGamesPlayed = 0;
+    this.setState((currentState) => ({
+      users: [...currentState.users, user]
+    }));
+  };
 
   render() {
     return (
@@ -41,7 +31,7 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">ReactND - Coding Practice</h1>
         </header>
-        <UserForm onAddUser={this.handleAddUser} onHideGamesPlayed={this.handleHideGamesPlayed} />
+        <UserForm users={this.state.users} onAddUser={this.handleAddUser} />
         <UserList users={this.state.users} />
       </div>
     );

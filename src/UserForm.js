@@ -4,54 +4,98 @@ import PropTypes from 'prop-types';
 class UserForm extends Component {
   
   static propTypes = {
-    onAddUser: PropTypes.func.isRequired
-  }
+    onAddUser: PropTypes.func.isRequired,
+    users: PropTypes.array.isRequired
+  };
 
   state = {
-    firstName: '',
-    lastName: '',
-    username: ''
-  }
+    user : {
+      firstName: '',
+      lastName: '',
+      username: ''
+    },
+    userExists: false
+  };
 
-  handleFirstNameChange = (event) => {
+  handleChange = (event) => {
+    const { name, value } = event.target;
+    
     this.setState({
-      firstName: event.target.value,
+      user: {
+        [name]: value
+      }
     });
-  }
-
-  handleLastNameChange = (event) => {
-    this.setState({
-      lastName: event.target.value
-    });
-  }
-
-  handleUsernameChange = (event) => {
-    this.setState({
-      username: event.target.value
-    });
-  }
+  };
 
   inputIsEmpty = () => {
-    return !(this.state.firstName !== '' && this.state.lastName !== '' && this.state.username !== '');
-  }
+    const { firstName, lastName, username } = this.state.user;
+    return firstName === '' || lastName === '' || username === '';
+  };
+
+  isUserDuplicate = (username) => {
+    for(let currentUser of this.props.users) {
+      if(currentUser.username === username) {
+        return true;
+      }
+    }
+    return false;
+  };
 
   addUser = (event) => {
     event.preventDefault();
-    this.props.onAddUser(this.state);
-  }
+    
+    const userExists = this.isUserDuplicate(this.state.user.username);
+    
+    if(!userExists) {
+      this.props.onAddUser(this.state.user);
+    }
+    
+    this.setState({
+      userExists
+    });
+  };
 
   render() {
+    const { firstName, lastName, username } = this.state.user;
+
     return (
       <div>
+        <h1> New User </h1>
         <form onSubmit={this.addUser}>
-          <label htmlFor="FirstName">First Name</label> 
-          <input type="text" id="FirstName" name="FirstName" placeholder="First Name" value={this.state.firstName} onChange={this.handleFirstNameChange} />
-          <label htmlFor="LastName">Last Name</label>
-          <input type="text" id="LastName" name="LastName" placeholder="Last Name" value={this.state.lastName} onChange={this.handleLastNameChange} />
-          <label htmlFor="Username">Username</label>
-          <input type="text" id="Username" name="Username" placeholder="Username" value={this.state.username} onChange={this.handleUsernameChange} />
+          <div>
+            <label htmlFor="firstName">First Name</label> 
+            <input
+              type="text"
+              id="firstName"
+              name="firstName"
+              placeholder="First Name"
+              value={firstName}
+              onChange={this.handleChange}
+            />
+            <label htmlFor="lastName">Last Name</label>
+            <input
+              type="text"
+              id="lastName"
+              name="lastName"
+              placeholder="Last Name"
+              value={lastName}
+              onChange={this.handleChange}
+            />
+            <label htmlFor="username">Username</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              placeholder="Username"
+              value={username}
+              onChange={this.handleChange}
+            />
+          </div>
           <button disabled={this.inputIsEmpty()}>Add</button>
         </form>
+        {this.state.userExists && (
+          <p className="error">User already exists</p>)
+        }
       </div>
     );
   }
